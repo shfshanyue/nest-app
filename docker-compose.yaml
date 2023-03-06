@@ -1,0 +1,60 @@
+version: "3"
+services:
+  redis:
+    image: redis:7.0.9-alpine
+    restart: always
+    expose:
+      - "6379"
+    volumes:
+      - ~/.data/redis:/data
+      - /etc/localtime:/etc/localtime
+      - /etc/timezone:/etc/timezone
+    command:
+      [
+          "redis-server",
+          "--appendonly",
+          "yes",
+          "--requirepass",
+          "${REDIS_PASSWORD}",
+      ]
+
+  app:
+    build: .
+    labels:
+      - traefik.http.routers.bot.rule=Host(`nest-app.shanyue.tech`)
+      - traefik.http.routers.bot.tls=true
+      - traefik.http.routers.bot.tls.certresolver=le
+      - traefik.http.middlewares.test-ipwhitelist.ipwhitelist.sourcerange=localhost
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /etc/timezone:/etc/timezone
+    env_file: .env
+    environment:
+      - NODE_ENV=production
+    restart: always
+
+  app-dev:
+    image: 'node:18-alpine'
+    restart: always
+    volumes:
+      - .:/code
+      - /etc/localtime:/etc/localtime
+      - /etc/timezone:/etc/timezone
+    working_dir: /code
+    command: npm run start:dev
+    env_file: .env
+    environment:
+      - NODE_ENV=development
+    labels:
+      - traefik.http.routers.app-dev.rule=Host(`app-dev.shanyue.tech`)
+      - traefik.http.routers.app-dev.tls=true
+      - traefik.http.routers.app-dev.tls.certresolver=le
+    expose:
+      - 3000
+    ports:
+      - "3000:3000"
+
+networks:
+   default:
+     external:
+       name: traefik_default
