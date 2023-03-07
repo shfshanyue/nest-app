@@ -12,4 +12,12 @@ export const REDIS_HOST = 'redis'
 export const REDIS_PORT = 6379
 export const REDIS_PASSWORD = process.env.REDIS_PASSWORD
 
+// postgres
+// 还没有启动 postgres 呢
+
+export const POSTGRES_HOST = 'postgres'
+export const POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD
+export const POSTGRES_USERNAME = 'postgres'
+export const POSTGRES_DATABASE = 'nest_app'
+
 export const APP_TOKEN = 'daxiange'
